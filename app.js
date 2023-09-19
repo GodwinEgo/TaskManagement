@@ -1,37 +1,18 @@
 const express = require("express");
 const mongoose = require("mongoose");
-const flash = require("connect-flash");
-const session = require("express-session");
 const cors = require("cors");
 const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 dotenv.config();
-const LocalStrategy = require("passport-local").Strategy;
 const bcrypt = require("bcrypt");
 
 const User = require("./models/User");
 const Task = require("./models/Task");
-const passport = require("passport");
 
 const app = express();
 const port = process.env.PORT || 8080;
 app.use(express.json());
 app.use(cors());
-
-//MIDDLEWARE FOR SESSION MANAGEMENT
-app.use(
-  session({
-    secret: process.env.SECRET_KEY,
-    resave: true,
-    saveUninitialized: true,
-  })
-);
-
-//INITIALIZE PASSPORT
-app.use(passport.initialize());
-app.use(passport.session());
-
-//PASSPORT LOCAL STRATEGY FOR AUTHENTICATION
 
 //MONGODB CONNECTION
 mongoose
@@ -51,6 +32,26 @@ app.get("/", (req, res) => {
   res.send("Welcome");
 });
 
+//REGISTER ROUTE
+app.post("/register", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    //check if username exits in th database
+    const existingUser = await User.findOne({ username });
+    if (existingUser) {
+      return res.status(400).json({ message: "Username Already exists" });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const user = new User({ username, password: hashedPassword });
+    user.save();
+    res.status(201).json({ message: "User Created Successfully" });
+  } catch (error) {
+    console.log("Error creating user: ", error);
+    res.status(201).json("Failed to register user");
+  }
+});
 //SERVER RUNNING
 app.listen(port, () => {
   console.log(`Server is running on ${port}`);
