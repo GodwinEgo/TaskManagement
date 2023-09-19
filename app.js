@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 
 const User = require("./models/User");
 const Task = require("./models/Task");
+const AuthenticatedUser = require("./middleware/Auth");
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -65,8 +66,16 @@ app.post("/login", async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).json({ error: "Invalid Password" });
     }
-    const token = jwt.sign({ userId: _id }, process.env.secretKey);
-  } catch (error) {}
+    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY);
+    return res.status(201).json({ message: "Login Successful!!", token });
+  } catch (error) {
+    res.status(400).json({ error: "Login Failed" });
+    console.log(error);
+  }
+});
+//PROTECTED ROUTE
+app.get("/protected", AuthenticatedUser, (req, res) => {
+  res.status(201).json({ message: "You've accessed a protcted route" });
 });
 
 //SERVER RUNNING
