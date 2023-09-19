@@ -1,15 +1,13 @@
 const express = require("express");
 const mongoose = require("mongoose");
 const cors = require("cors");
-const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 dotenv.config();
-const bcrypt = require("bcrypt");
-const jwt = require("jsonwebtoken");
-
 const User = require("./models/User");
 const Task = require("./models/Task");
 const AuthenticatedUser = require("./middleware/Auth");
+const RegisterRoute = require("./routes/UserRegisterRoute");
+const LoginRoute = require("./routes/UserLoginRoute");
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -35,44 +33,9 @@ app.get("/", (req, res) => {
 });
 
 //REGISTER ROUTE
-app.post("/register", async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    //check if username exits in th database
-    const existingUser = await User.findOne({ username });
-    if (existingUser) {
-      return res.status(400).json({ message: "Username Already exists" });
-    }
-
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    const user = new User({ username, password: hashedPassword });
-    user.save();
-    res.status(201).json({ message: "User Created Successfully" });
-  } catch (error) {
-    console.log("Error creating user: ", error);
-    res.status(201).json({ error: "Failed to register user" });
-  }
-});
+app.post("/register", RegisterRoute);
 //LOGIN ROUTE
-app.post("/login", async (req, res) => {
-  try {
-    const { username, password } = req.body;
-    const user = await User.findOne({ username });
-    if (!user) {
-      return res.status(401).json({ error: "User Not Found" });
-    }
-    const passwordMatch = await bcrypt.compare(password, user.password);
-    if (!passwordMatch) {
-      return res.status(401).json({ error: "Invalid Password" });
-    }
-    const token = jwt.sign({ userId: user._id }, process.env.SECRET_KEY);
-    return res.status(201).json({ message: "Login Successful!!", token });
-  } catch (error) {
-    res.status(400).json({ error: "Login Failed" });
-    console.log(error);
-  }
-});
+app.post("/login", LoginRoute);
 //PROTECTED ROUTE
 app.get("/protected", AuthenticatedUser, (req, res) => {
   res.status(201).json({ message: "You've accessed a protcted route" });
