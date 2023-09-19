@@ -49,9 +49,24 @@ app.post("/register", async (req, res) => {
     res.status(201).json({ message: "User Created Successfully" });
   } catch (error) {
     console.log("Error creating user: ", error);
-    res.status(201).json("Failed to register user");
+    res.status(201).json({ error: "Failed to register user" });
   }
 });
+//LOGIN ROUTE
+app.post("/login", async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    const user = await User.findOne({ username });
+    if (!user) {
+      return res.status(401).json({ error: "User Not Found" });
+    }
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch) {
+      return res.status(401).json({ error: "Invalid Password" });
+    }
+  } catch (error) {}
+});
+
 //SERVER RUNNING
 app.listen(port, () => {
   console.log(`Server is running on ${port}`);
