@@ -5,6 +5,7 @@ const bodyParser = require("body-parser");
 const dotenv = require("dotenv");
 dotenv.config();
 const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 
 const User = require("./models/User");
 const Task = require("./models/Task");
@@ -64,6 +65,7 @@ app.post("/login", async (req, res) => {
     if (!passwordMatch) {
       return res.status(401).json({ error: "Invalid Password" });
     }
+    const token = jwt.sign({ userId: _id }, process.env.secretKey);
   } catch (error) {}
 });
 
