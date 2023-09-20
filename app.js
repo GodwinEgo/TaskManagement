@@ -38,7 +38,7 @@ app.post("/register", RegisterRoute);
 app.post("/login", LoginRoute);
 //PROTECTED ROUTE
 app.get("/protected", AuthenticatedUser, (req, res) => {
-  res.status(201).json({ message: "You've accessed a protcted route" });
+  res.status(201).json({ message: "Hey! You've accessed a protcted route" });
 });
 
 //SERVER RUNNING
