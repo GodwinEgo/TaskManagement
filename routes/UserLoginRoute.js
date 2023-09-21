@@ -17,7 +17,7 @@ const LoginRoute = async (req, res) => {
     return res.status(201).json({ message: "Login Successful!!", token });
   } catch (error) {
     res.status(400).json({ error: "Login Failed" });
-    console.log(error);
+    console.log(`error logging in: ${error}`);
   }
 };
 module.exports = LoginRoute;
