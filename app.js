@@ -6,6 +6,7 @@ dotenv.config();
 const AuthenticatedUser = require("./middleware/Auth");
 const RegisterRoute = require("./routes/UserRegisterRoute");
 const LoginRoute = require("./routes/UserLoginRoute");
+const taskRoutes = require("./routes/TaskRoute");
 
 const app = express();
 const port = process.env.PORT || 8080;
@@ -34,6 +35,8 @@ app.get("/", (req, res) => {
 app.post("/register", RegisterRoute);
 //LOGIN ROUTE
 app.post("/login", LoginRoute);
+
+app.use("/api", taskRoutes);
 //PROTECTED ROUTE
 app.get("/protected", AuthenticatedUser, (req, res) => {
   res.status(201).json({ message: "Hey! You've accessed a protcted route" });
