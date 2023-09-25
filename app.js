@@ -4,8 +4,7 @@ const cors = require("cors");
 const dotenv = require("dotenv");
 dotenv.config();
 const AuthenticatedUser = require("./middleware/Auth");
-const RegisterRoute = require("./routes/UserRegisterRoute");
-const LoginRoute = require("./routes/UserLoginRoute");
+const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/TaskRoute");
 
 const app = express();
@@ -31,15 +30,13 @@ app.get("/", (req, res) => {
   res.send("Welcome");
 });
 
-//REGISTER ROUTE
-app.post("/register", RegisterRoute);
-//LOGIN ROUTE
-app.post("/login", LoginRoute);
+//AUTH
+app.use("/auth", authRoutes);
 
 app.use("/api", taskRoutes);
 //PROTECTED ROUTE
 app.get("/protected", AuthenticatedUser, (req, res) => {
-  res.status(201).json({ message: "Hey! You've accessed a protcted route" });
+  res.status(201).json({ message: "Hey! You've accessed a protected route" });
 });
 
 //SERVER RUNNING
