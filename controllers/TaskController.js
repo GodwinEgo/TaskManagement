@@ -39,5 +39,23 @@ const getTaskById = async (req, res) => {
     if (!task) {
       return res.status(400).json({ error: "Task not found" });
     }
-  } catch (error) {}
+    //check if the task belongs to the authenticated user
+    if (task.user.toString() !== req.user.id) {
+      return res.status(403).json({ error: "Access Denied!!" });
+    }
+
+    res.json(task);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server Error" });
+  }
 };
+
+//UPDATE A TASK BY ID
+const updateTask = async (req, res) => { 
+    try {
+        const {tit}
+    } catch (error) {
+        
+    }
+}
