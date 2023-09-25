@@ -17,8 +17,8 @@ const AuthenticatedUser = (req, res, next) => {
     req.userData = { userId: decodedToken.userId };
     next();
   } catch (error) {
-    return res.staus(401).json({ error: "Unauthorized" });
     console.error(error);
+    return res.staus(401).json({ error: "Unauthorized" });
   }
 };
 
