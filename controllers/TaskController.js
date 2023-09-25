@@ -35,9 +35,9 @@ const getAllTasks = async (req, res) => {
 //GET A SINGLE TASK BY ID
 const getTaskById = async (req, res) => {
   try {
-    const task = await Task.findById(req.params.taskd);
+    const task = await Task.findById(req.params.taskId);
     if (!task) {
-      return res.status(400).json({ error: "Task not found" });
+      return res.status(404).json({ error: "Task not found" });
     }
     //check if the task belongs to the authenticated user
     if (task.user.toString() !== req.user.id) {
@@ -52,10 +52,56 @@ const getTaskById = async (req, res) => {
 };
 
 //UPDATE A TASK BY ID
-const updateTask = async (req, res) => { 
-    try {
-        const {tit}
-    } catch (error) {
-        
+const updateTask = async (req, res) => {
+  try {
+    const { title, description, dueDate, status } = req.body;
+
+    const task = await Task.findById(req.params.taskId);
+    if (!task) {
+      return res.status(404).json({ error: "Task Not Found" });
     }
-}
+    //check if the task belongs to an authenticated user
+    if (task.user.toString() !== req.user.id) {
+      return res.status(403).json({ error: "Access Denied" });
+    }
+    //upadate task fields
+    task.title = title;
+    tasl.description = description;
+    task.dueDate = dueDate;
+    task.status = status;
+
+    await task.save();
+    res.json(task);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+//DELETE A TASK BY ID
+const deleteTask = async (req, res) => {
+  try {
+    const task = await Task.findById(req.params.taskId);
+
+    if (!task) {
+      return res.status(404).json({ error: "Task Not Found" });
+    }
+    //check if task belongs to authenticated user
+    if (task.user.toString() !== req.user.id) {
+      return res.status(403).json({ error: "Access denied" });
+    }
+    await task.remove();
+    res.json({ message: "Task Deleted" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "server error" });
+  }
+};
+
+module.exports = {
+  createTask,
+  getAllTasks,
+  getTaskById,
+  updateTask,
+  deleteTask,
+};
